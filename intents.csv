@@ -1,0 +1,101 @@
+query,intent
+Book a flight to Delhi,oncontext_booking
+I need to book tickets for tomorrow,oncontext_booking
+Can you help me book a flight?,oncontext_booking
+Reserve a flight from Chennai to Mumbai,oncontext_booking
+Book two seats to Bangalore,oncontext_booking
+I want to book a flight for next week,oncontext_booking
+Please book my ticket to Hyderabad,oncontext_booking
+Can you schedule a flight to Pune?,oncontext_booking
+I need to reserve a seat for Monday,oncontext_booking
+Book me a flight from Kochi to Delhi,oncontext_booking
+Get me a flight for tonight,oncontext_booking
+Book the earliest flight to Chennai,oncontext_booking
+I want to make a new flight booking,oncontext_booking
+Can you reserve two tickets to Goa?,oncontext_booking
+Book a flight to Mumbai for two adults,oncontext_booking
+Need to book a flight ASAP,oncontext_booking
+Please confirm my flight booking,oncontext_booking
+I’d like to fly to Kolkata tomorrow,oncontext_booking
+Find a flight for me,oncontext_booking
+Book a round trip from Delhi to Bangalore,oncontext_booking
+I want to cancel my flight,oncontext_cancellation
+Cancel my ticket to Hyderabad,oncontext_cancellation
+Please cancel my flight booking,oncontext_cancellation
+I need to cancel my reservation,oncontext_cancellation
+Withdraw my booking,oncontext_cancellation
+Cancel all my current bookings,oncontext_cancellation
+Can you help me cancel my ticket?,oncontext_cancellation
+Cancel my return flight,oncontext_cancellation
+Cancel the flight I booked yesterday,oncontext_cancellation
+Please delete my booking,oncontext_cancellation
+I want to withdraw my reservation,oncontext_cancellation
+Cancel ticket to Mumbai,oncontext_cancellation
+Cancel my flight for tonight,oncontext_cancellation
+Can you cancel my ticket please?,oncontext_cancellation
+Cancel all pending reservations,oncontext_cancellation
+I’d like to cancel today’s flight,oncontext_cancellation
+Please stop my booking,oncontext_cancellation
+Cancel the morning flight,oncontext_cancellation
+How do I cancel my flight ticket?,oncontext_cancellation
+Please revoke my booking,oncontext_cancellation
+What’s the flight status for AI302?,oncontext_status
+Check the status of flight Indigo 203,oncontext_status
+Is my flight delayed?,oncontext_status
+Tell me if the flight to Kolkata is on time,oncontext_status
+Show me my flight status,oncontext_status
+Can you check if my flight has departed?,oncontext_status
+Is the flight on time?,oncontext_status
+What’s the delay for flight SG204?,oncontext_status
+Status of flight AI101,oncontext_status
+Check real-time status for SpiceJet,oncontext_status
+Track flight Indigo 202,oncontext_status
+Tell me flight updates for today,oncontext_status
+Give me the current status of my flight,oncontext_status
+Find flight status of Air India 203,oncontext_status
+Is my flight boarding now?,oncontext_status
+Track live flight updates,oncontext_status
+Tell me if the flight is cancelled,oncontext_status
+Flight tracker for Vistara 505,oncontext_status
+Give latest info for AirAsia flight,oncontext_status
+Status update for flight 6E203,oncontext_status
+Is seat 23A available?,oncontext_seat_availability
+Check seat 12A availability,oncontext_seat_availability
+Are window seats available?,oncontext_seat_availability
+Can I get a window seat?,oncontext_seat_availability
+Are there any aisle seats?,oncontext_seat_availability
+Show me available seats,oncontext_seat_availability
+Which seats are free for this flight?,oncontext_seat_availability
+Check if seat 15C is available,oncontext_seat_availability
+Is business class full?,oncontext_seat_availability
+List all available seats,oncontext_seat_availability
+Can I upgrade my seat?,oncontext_seat_availability
+Are economy seats open?,oncontext_seat_availability
+Is premium economy available?,oncontext_seat_availability
+Do you have window seat left?,oncontext_seat_availability
+Show seat layout,oncontext_seat_availability
+Which seats are vacant?,oncontext_seat_availability
+Check seats for tomorrow’s flight,oncontext_seat_availability
+Find me a window seat,oncontext_seat_availability
+Any seats left for the evening flight?,oncontext_seat_availability
+Seat availability for Indigo 303,oncontext_seat_availability
+Who are you?,offcontext
+Tell me a joke,offcontext
+What’s the time now?,offcontext
+How’s the weather today?,offcontext
+Who created you?,offcontext
+What’s your favorite movie?,offcontext
+Do you like pizza?,offcontext
+What’s happening?,offcontext
+Tell me about yourself,offcontext
+What can you do?,offcontext
+How old are you?,offcontext
+What’s your purpose?,offcontext
+Do you like humans?,offcontext
+Can you sing a song?,offcontext
+Do you play games?,offcontext
+Who made you?,offcontext
+Where are you from?,offcontext
+What’s your favorite color?,offcontext
+Do you sleep?,offcontext
+Say something funny,offcontext
