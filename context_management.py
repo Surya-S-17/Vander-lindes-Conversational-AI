@@ -8,15 +8,9 @@ from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 from openai import OpenAI
 
-# -----------------------------
-# 0) Logging
-# -----------------------------
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("context-service")
 
-# -----------------------------
-# 1) Env & OpenAI configuration
-# -----------------------------
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini").strip()
@@ -26,9 +20,6 @@ if not OPENAI_API_KEY:
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-# -----------------------------
-# 2) Pydantic data contracts
-# -----------------------------
 class Message(BaseModel):
     role: Literal["user", "bot", "system"]
     message: str
@@ -55,11 +46,9 @@ class ContextRequest(BaseModel):
     history: List[Message] = Field(default_factory=list)
     new_message: str
 
-# -----------------------------
-# 3) Prompt builder
-# -----------------------------
+
 def build_prompt(history: List[Message], new_message: str, schema: Dict[str, Any]) -> Dict[str, str]:
-    # System message with rules + embedded schema spec (model is in JSON mode so it must return JSON)
+
     system_instructions = f"""
 You are the Context Management module for a production conversational AI system.
 
@@ -87,9 +76,7 @@ Conversation:
 
     return {"system": system_instructions, "user": user_content}
 
-# -----------------------------
-# 4) Heuristic extractor (debug fallback)
-# -----------------------------
+
 from datetime import datetime, date
 from dateutil import parser as dparser
 import re
@@ -135,7 +122,6 @@ def _parse_iso_date_loose(text: str | None) -> str | None:
 def _clean_loc(s: str | None) -> str | None:
     if not s: return None
     s = s.strip()
-    # Drop trailing stop tokens
     while s and s[-1] in STOP_TOKENS:
         s = s[:-1].strip()
     return s or None
@@ -149,23 +135,19 @@ def _to_int_or_none(v):
     return words.get(s.lower())
 
 def normalize_structured_context(sc: "StructuredContext") -> "StructuredContext":
-    # Canonicalize intent
+
     if sc.intent:
         sc.intent = INTENT_CANON.get(sc.intent.lower(), sc.intent)
 
-    # Clean locations
     sc.slots.origin = _clean_loc(sc.slots.origin)
     sc.slots.destination = _clean_loc(sc.slots.destination)
 
-    # Normalize date to ISO if possible
     iso = _parse_iso_date_loose(sc.slots.date)
     if iso:
         sc.slots.date = iso
 
-    # Normalize passengers to int
     sc.slots.passengers = _to_int_or_none(sc.slots.passengers)
 
-    # Compose user_goal if absent and we have enough info
     if not sc.user_goal:
         bits = []
         if sc.slots.origin: bits.append(f"from {sc.slots.origin}")
@@ -175,7 +157,6 @@ def normalize_structured_context(sc: "StructuredContext") -> "StructuredContext"
         if bits:
             sc.user_goal = "Book flight " + " ".join(bits) + "."
 
-    # Ensure context_summary is present and helpful
     if not sc.context_summary or not sc.context_summary.strip():
         if sc.user_goal:
             sc.context_summary = sc.user_goal
@@ -192,7 +173,6 @@ def _normalize_date_guess(text: str) -> Optional[str]:
     try:
         base = datetime(today.year, today.month, today.day)
         dt = dparser.parse(text, fuzzy=True, default=base)
-        # If user didn’t specify a year and parsed date already passed this year, roll to next year
         if dt.date() < today and not re.search(r"\b20\d{2}\b", text):
             dt = dt.replace(year=dt.year + 1)
         return dt.date().isoformat()
@@ -200,7 +180,6 @@ def _normalize_date_guess(text: str) -> Optional[str]:
         return None
 
 def _clean_location(loc: str) -> str:
-    # Trim trailing stop words / month words / numeric date tokens (e.g., "Delhi October 25th" -> "Delhi")
     tokens = [t for t in re.split(r"\s+", loc.strip()) if t]
     cleaned = []
     for t in tokens:
@@ -211,18 +190,15 @@ def _clean_location(loc: str) -> str:
     return " ".join(cleaned).strip()
 
 def crude_extract(history: List["Message"], new_message: str) -> Tuple[Optional[str], Optional[str], Optional[str], Optional[int]]:
-    # Only user messages + the new user message
+
     user_text = " ".join([m.message for m in history if m.role == "user"] + [new_message])
 
-    # Find all "from X to Y" pairs; take the last (closest to the latest message)
     pairs = re.findall(r"[Ff]rom\s+([A-Za-z][\w .-]{1,60})\s+(?:to|2)\s+([A-Za-z][\w .-]{1,80})", user_text)
     origin = destination = None
     if pairs:
         origin_raw, dest_raw = pairs[-1]
         origin = _clean_location(origin_raw)
         destination = _clean_location(dest_raw)
-
-    # Passengers
     m2 = re.search(r"\bfor\s+(\d+|one|two|three|four|five)\s+(people|passengers)\b", user_text, re.I)
     word2num = {"one":1,"two":2,"three":3,"four":4,"five":5}
     passengers: Optional[int] = None
@@ -230,19 +206,14 @@ def crude_extract(history: List["Message"], new_message: str) -> Tuple[Optional[
         v = m2.group(1).lower()
         passengers = int(v) if v.isdigit() else word2num.get(v)
 
-    # Date
     date_iso = _normalize_date_guess(user_text)
 
-    # Normalize empties to None
     if origin == "": origin = None
     if destination == "": destination = None
 
     return origin, destination, date_iso, passengers
 
 
-# -----------------------------
-# 5) OpenAI call (Chat Completions JSON mode)
-# -----------------------------
 def call_openai_json_mode(system_msg: str, user_msg: str) -> str:
     """
     Calls Chat Completions with JSON mode enabled. Returns JSON string.
@@ -254,16 +225,14 @@ def call_openai_json_mode(system_msg: str, user_msg: str) -> str:
             {"role": "user", "content": user_msg},
         ],
         temperature=0,
-        response_format={"type": "json_object"}  # <-- JSON mode
+        response_format={"type": "json_object"}
     )
     content = resp.choices[0].message.content
     if not content:
         raise RuntimeError("Empty completion content.")
     return content
 
-# -----------------------------
-# 6) FastAPI app & endpoints
-# -----------------------------
+
 app = FastAPI(title="Context Management Service (OpenAI Chat JSON Mode)", version="1.1.0")
 
 @app.post("/summarize_context", response_model=StructuredContext)
@@ -277,7 +246,6 @@ def summarize_context(req: ContextRequest) -> StructuredContext:
         raw_obj = json.loads(raw_json)
 
         sc = StructuredContext.model_validate(raw_obj)
-        # Ensure normalized history (we don’t trust the model for this)
         sc.history = full_history
         sc = normalize_structured_context(sc)
 
@@ -289,7 +257,6 @@ def summarize_context(req: ContextRequest) -> StructuredContext:
     except Exception as e:
         origin, dest, date_iso, pax = crude_extract(req.history, req.new_message)
 
-        # Compose a clean, informative summary
         summary_bits = ["Book flight"]
         if origin: summary_bits.append(f"from {origin}")
         if dest:   summary_bits.append(f"to {dest}")
@@ -318,3 +285,4 @@ def summarize_context(req: ContextRequest) -> StructuredContext:
 @app.get("/health")
 def health():
     return {"status": "ok", "model": OPENAI_MODEL}
+
