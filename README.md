@@ -143,7 +143,7 @@ Navigate to `http://localhost:8501` in your browser to interact with the chatbot
 
 This project was a collaborative effort by:
 
-* **Your Name**: Context Management (`context_management.py`)
+* **Surya**: Context Management (`context_management.py`)
 * **Swadhi**: Intent Routing (`intent_classify.py`, `fine_tune_classifier.py`)
 * **Aswath**: Policy Retrieval & RAG (`Policy_retrival_RAG.ipynb`)
 * **Mukhil**: Core Logic & Response Generation (`response_generation.py`)
